@@ -103,6 +103,7 @@ const saveDatatoSQL = async (data) => {
 const main = async () => {
     const browser = await puppeteer.launch({
         headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     });
 
     const jsonData = await csv().fromFile(CONFIG.paths.inputFile);
