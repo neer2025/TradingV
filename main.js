@@ -75,7 +75,7 @@ const extractandSaveCompanyData = async (browser, link, symbol) => {
         await page.close(); // Close the page after extraction
     }
     catch (error) {
-        console.error(`Page not found for ${link}`, error);
+        console.error(`Page not found for ${link}`, error.message);
         return [];
     }
 }
