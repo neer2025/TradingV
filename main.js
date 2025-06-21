@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer-core";
+import puppeteer from "puppeteer";
 import csv from "csvtojson";
 import axios from "axios";
 
@@ -103,7 +103,6 @@ const saveDatatoSQL = async (data) => {
 const main = async () => {
     const browser = await puppeteer.launch({
         headless: true,
-        executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
     });
 
     const jsonData = await csv().fromFile(CONFIG.paths.inputFile);
