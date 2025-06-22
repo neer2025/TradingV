@@ -111,25 +111,25 @@ const run = async (jsonData, idx) => {
             await extractandSaveCompanyData(browser, jsonData[i]['Scrap_Link'], jsonData[i]['Symbol']);
         }
 
-        await browser.close();
-        return i;
     } catch (error) {
         console.error(`Error processing:`, error.message);
-        return i; // Return the current index to continue later
     }
+
+    await browser.close();
+    return i;  // Return the current index to continue later
 }
 
 const main = async () => {
     const jsonData = await csv().fromFile(CONFIG.paths.inputFile);
 
     let idx = 0;
-    if (idx < jsonData.length) {
+    while (idx < jsonData.length) {
         // Continue processing the next batch if browser timeout occurs
         console.log(`Processing next batch from index ${idx}`);
         idx = await run(jsonData, idx);
-    } else {
-        console.log('All data processed successfully.');
     }
+
+    console.log('All data processed successfully.');
 }
 
 main();
