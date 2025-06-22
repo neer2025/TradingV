@@ -81,38 +81,56 @@ const extractandSaveCompanyData = async (browser, link, symbol) => {
 }
 
 const saveDatatoSQL = async (data) => {
+    // try {
+    const response = await axios.post(CONFIG.wpApiUrl, {
+        Headline: data.headline,
+        Fullarticle: data.content,
+        Provider: data.provider || 'General',
+        Symbol: data.symbol,
+        date: data.date || new Date().toISOString()
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
+
+    // console.log('Stored in WordPress:', response.data);
+    // } catch (error) {
+    //     console.error('WP API Error:', error.response?.data || error.message);
+    // }
+}
+
+const run = async (jsonData, idx) => {
+    let i = idx;
     try {
-        const response = await axios.post(CONFIG.wpApiUrl, {
-            Headline: data.headline,
-            Fullarticle: data.content,
-            Provider: data.provider || 'General',
-            Symbol: data.symbol,
-            date: data.date || new Date().toISOString()
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-            }
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
         });
 
-        // console.log('Stored in WordPress:', response.data);
+        for (; i < jsonData.length; i++) {
+            await extractandSaveCompanyData(browser, jsonData[i]['Scrap_Link'], jsonData[i]['Symbol']);
+        }
+
+        await browser.close();
+        return i;
     } catch (error) {
-        console.error('WP API Error:', error.response?.data || error.message);
+        console.error(`Error processing:`, error.message);
+        return i; // Return the current index to continue later
     }
 }
 
 const main = async () => {
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-    });
-
     const jsonData = await csv().fromFile(CONFIG.paths.inputFile);
 
-    for (const item of jsonData) {
-        await extractandSaveCompanyData(browser, item['Scrap_Link'], item['Symbol']);
+    let idx = 0;
+    if (idx < jsonData.length) {
+        // Continue processing the next batch if browser timeout occurs
+        console.log(`Processing next batch from index ${idx}`);
+        idx = await run(jsonData, idx);
+    } else {
+        console.log('All data processed successfully.');
     }
-
-    await browser.close();
 }
 
 main();
