@@ -93,7 +93,7 @@ const saveDatatoSQL = async (data) => {
             }
         });
 
-        console.log('Stored in WordPress:', response.data);
+        // console.log('Stored in WordPress:', response.data);
     } catch (error) {
         console.error('WP API Error:', error.response?.data || error.message);
     }
