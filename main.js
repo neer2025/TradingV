@@ -27,8 +27,6 @@ const getNewsArticleData = async (browser, path) => {
 const extractandSaveCompanyData = async (browser, link, symbol) => {
     const page = await browser.newPage();
 
-    console.log(`Extracting data from: ${link}`);
-
     try {
         await page.goto(link, { waitUntil: 'networkidle2' });
         await page.waitForSelector('div.list-iTt_Zp4a', { timeout: 2000 });
@@ -72,6 +70,7 @@ const extractandSaveCompanyData = async (browser, link, symbol) => {
             await saveDatatoSQL(newsData); // Save news item to SQL
         }
 
+        console.log(`Data extraction completed for: ${link}, items extracted: ${newsMeta.length}.`);
         await page.close(); // Close the page after extraction
     }
     catch (error) {
@@ -81,23 +80,23 @@ const extractandSaveCompanyData = async (browser, link, symbol) => {
 }
 
 const saveDatatoSQL = async (data) => {
-    // try {
-    const response = await axios.post(CONFIG.wpApiUrl, {
-        Headline: data.headline,
-        Fullarticle: data.content,
-        Provider: data.provider || 'General',
-        Symbol: data.symbol,
-        date: data.date || new Date().toISOString()
-    }, {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    });
+    try {
+        const response = await axios.post(CONFIG.wpApiUrl, {
+            Headline: data.headline,
+            Fullarticle: data.content,
+            Provider: data.provider || 'General',
+            Symbol: data.symbol,
+            date: data.date || new Date().toISOString()
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
 
-    // console.log('Stored in WordPress:', response.data);
-    // } catch (error) {
-    //     console.error('WP API Error:', error.response?.data || error.message);
-    // }
+        console.log('Stored in WordPress:', response.data);
+    } catch (error) {
+        console.error('WP API Error:', error.response?.data || error.message);
+    }
 }
 
 const run = async (jsonData, idx) => {
