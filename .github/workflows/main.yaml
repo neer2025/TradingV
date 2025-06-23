@@ -3,6 +3,7 @@ name: Run TradingViewNews Scraper
 on:
   schedule:
     - cron: '30 13 * * *'   # Every day at 13:30 UTC (7pm IST)
+  workflow_dispatch:
 
 jobs:
   scrape:
