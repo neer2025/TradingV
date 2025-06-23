@@ -2,7 +2,7 @@ name: Run TradingViewNews Scraper
 
 on:
   schedule:
-    - cron: '0 19 * * *'   # Every day at 19:00 UTC (7pm)
+    - cron: '30 13 * * *'   # Every day at 13:30 UTC (7pm IST)
 
 jobs:
   scrape:
