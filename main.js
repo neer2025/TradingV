@@ -2,6 +2,9 @@ import puppeteer from "puppeteer";
 import csv from "csvtojson";
 import axios from "axios";
 
+// to get the WP API token, run the following command in terminal or postman:
+// curl -X POST https://profitbooking.in/wp-json/jwt-auth/v1/token \ -d "username=yourusername&password=yourpassword"  
+
 const CONFIG = {
     wpApiUrl: 'https://profitbooking.in/wp-json/scraper/v1/tradingview',
     paths: {
@@ -89,6 +92,7 @@ const saveDatatoSQL = async (data) => {
             date: data.date || new Date().toISOString()
         }, {
             headers: {
+                // 'Authorization': `Bearer ${process.env.WP_API_TOKEN}`,
                 'Content-Type': 'application/json',
             }
         });
@@ -99,15 +103,14 @@ const saveDatatoSQL = async (data) => {
     }
 }
 
-const run = async (jsonData, idx) => {
-    let i = idx;
+const run = async (jsonData, start, end) => {
     try {
         const browser = await puppeteer.launch({
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
         });
 
-        for (; i < jsonData.length; i++) {
+        for (let i = start; i < end; i++) {
             await extractandSaveCompanyData(browser, jsonData[i]['Scrap_Link'], jsonData[i]['Symbol']);
         }
 
@@ -116,18 +119,15 @@ const run = async (jsonData, idx) => {
     }
 
     await browser.close();
-    return i;  // Return the current index to continue later
 }
 
 const main = async () => {
     const jsonData = await csv().fromFile(CONFIG.paths.inputFile);
 
-    let idx = 0;
-    while (idx < jsonData.length) {
-        // Continue processing the next batch if browser timeout occurs
-        console.log(`Processing next batch from index ${idx}`);
-        idx = await run(jsonData, idx);
-    }
+    const start = parseInt(process.argv[2]) || 0; // Start index from command line argument or default to 0
+    const end = parseInt(process.argv[3]) || jsonData.length; // End index from command line argument or default to 100
+
+    await run(jsonData, start, end);
 
     console.log('All data processed successfully.');
 }
