@@ -104,11 +104,12 @@ const saveDatatoSQL = async (data) => {
 }
 
 const run = async (jsonData, start, end) => {
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    });
+
     try {
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-        });
 
         for (let i = start; i < end; i++) {
             await extractandSaveCompanyData(browser, jsonData[i]['Scrap_Link'], jsonData[i]['Symbol']);
