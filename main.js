@@ -29,6 +29,7 @@ const getNewsArticleData = async (browser, path) => {
 
 const extractandSaveCompanyData = async (browser, link, symbol) => {
     const page = await browser.newPage();
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 2 seconds before navigating
 
     try {
         await page.goto(link, { waitUntil: 'networkidle2' });
@@ -106,15 +107,14 @@ const saveDatatoSQL = async (data) => {
 const run = async (jsonData, start, end) => {
     const browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-features=site-per-process']
     });
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 2 seconds before starting
 
     try {
-
         for (let i = start; i < end; i++) {
             await extractandSaveCompanyData(browser, jsonData[i]['Scrap_Link'], jsonData[i]['Symbol']);
         }
-
     } catch (error) {
         console.error(`Error processing:`, error.message);
     }
