@@ -107,7 +107,16 @@ const saveDatatoSQL = async (data) => {
 const run = async (jsonData, start, end) => {
     const browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-features=site-per-process']
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--single-process',
+            '--disable-gpu',
+            '--disable-features=site-per-process',
+            '--disable-extensions',
+            '--disable-blink-features=AutomationControlled',
+        ]
     });
     await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 2 seconds before starting
 
