@@ -123,7 +123,7 @@ const saveDatatoSQL = async (data) => {
 
 const run = async (jsonData, start, end) => {
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         args: [
             "--no-sandbox",
             "--disable-setuid-sandbox",
